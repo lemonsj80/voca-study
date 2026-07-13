@@ -93,6 +93,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 .preview-box { margin-top: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: none; }
 .preview-box.show { display: block; }
 .preview-word { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.3px; margin-bottom: 4px; }
+.preview-meaning-field { margin: 10px 0; }
+.preview-meaning-label { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
+.preview-meaning-input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; font-weight: 600; font-family: inherit; background: var(--surface); outline: none; transition: border-color 0.2s; }
+.preview-meaning-input:focus { border-color: var(--accent); }
 .preview-pron { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
 .preview-meaning { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
 .preview-example { font-size: 13px; color: var(--muted); font-style: normal; font-family: 'DM Sans', sans-serif; }
@@ -206,6 +210,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 .cal-day.has-words:hover { background: var(--accent-light); color: var(--accent); }
 .cal-day.today { background: var(--accent-light); color: var(--accent); font-weight: 700; }
 .cal-day.selected { background: var(--accent); color: white !important; font-weight: 700; border-radius: 50%; }
+.cal-day.range-edge { background: var(--accent); color: white !important; font-weight: 700; border-radius: 50%; }
+.cal-day.in-range { background: var(--accent-light); color: var(--accent); border-radius: 0; }
 .cal-day.has-words .dot-mark { width: 3px; height: 3px; border-radius: 50%; background: var(--accent); }
 .cal-day.selected .dot-mark { background: rgba(255,255,255,0.6); }
 
@@ -261,6 +267,57 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
   .wc-word { font-size: 26px; }
   .wc-meaning { font-size: 20px; }
 }
+
+/* ── 테스트 탭 ── */
+.test-setup-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); }
+.test-setup-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+.test-field { margin-bottom: 16px; }
+.test-field-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+.test-mode-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+.test-mode-btn { flex: 1; padding: 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; text-align: center; transition: all 0.2s; }
+.test-mode-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.test-select, .test-date-input, .test-num-input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: inherit; background: var(--bg); outline: none; }
+.test-range-row { display: flex; gap: 8px; align-items: center; }
+.test-range-row span { color: var(--muted); font-size: 13px; }
+.test-dir-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.test-dir-btn { flex: 1; min-width: 90px; padding: 9px 6px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; text-align: center; transition: all 0.2s; }
+.test-dir-btn.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.test-start-btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; color: white; margin-top: 6px; background: var(--accent); }
+.test-count-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.test-quiz-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px 20px; box-shadow: var(--shadow); text-align: center; }
+.test-progress { font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+.test-progress-bar { height: 5px; background: var(--accent-light); border-radius: 3px; overflow: hidden; margin-bottom: 22px; }
+.test-progress-fill { height: 100%; background: var(--accent); transition: width 0.25s ease; }
+.test-prompt-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+.test-prompt { font-size: 30px; font-weight: 700; margin-bottom: 26px; word-break: keep-all; line-height: 1.4; }
+.test-prompt.is-word { font-family: 'DM Sans', sans-serif; }
+.test-answer-input { width: 100%; padding: 13px 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 17px; font-family: inherit; text-align: center; outline: none; transition: border-color 0.2s; }
+.test-answer-input:focus { border-color: var(--accent); }
+.test-answer-input.correct { border-color: #2c6e49; background: #f4fbf6; }
+.test-answer-input.wrong { border-color: #e74c3c; background: #fdf3f3; }
+.test-feedback { margin-top: 14px; font-size: 14px; font-weight: 600; min-height: 22px; }
+.test-feedback.correct { color: #2c6e49; }
+.test-feedback.wrong { color: #c0392b; }
+.test-action-btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; color: white; margin-top: 18px; background: var(--accent); }
+.test-quit-link { display: block; text-align: center; font-size: 12px; color: var(--muted); margin-top: 14px; cursor: pointer; text-decoration: underline; }
+
+.test-summary-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px 22px; box-shadow: var(--shadow); text-align: center; }
+.test-summary-score { font-family: 'DM Sans', sans-serif; font-size: 44px; font-weight: 700; margin: 6px 0 4px; }
+.test-summary-label { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+.test-summary-actions { display: flex; gap: 8px; margin-bottom: 20px; }
+.test-wrong-list { text-align: left; }
+.test-wrong-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg); border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+.test-wrong-word { font-family: 'DM Sans', sans-serif; font-weight: 700; min-width: 90px; }
+.test-wrong-meaning { color: var(--muted); flex: 1; }
+.test-wrong-given { color: #c0392b; font-size: 12px; }
+
+/* ── 사진 인식 모달 ── */
+.photo-word-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; }
+.photo-word-row.dup { opacity: 0.55; }
+.photo-word-row input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; }
+.photo-word-text { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; }
+.photo-word-dup-badge { font-size: 11px; color: var(--muted); margin-left: auto; }
 </style>
 </head>
 <body>
@@ -281,6 +338,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
   <div class="menu-tab active" id="menuTab-wordbook" onclick="switchMenu('wordbook')">📖 단어장</div>
   <div class="menu-tab" id="menuTab-flashcard" onclick="switchMenu('flashcard')">📇 플래시카드</div>
   <div class="menu-tab" id="menuTab-review" onclick="switchMenu('review')">📅 날짜별 기록</div>
+  <div class="menu-tab" id="menuTab-test" onclick="switchMenu('test')">🧪 테스트</div>
 </div>
 
 <div class="main">
@@ -297,6 +355,10 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     <div class="preview-box" id="previewBox">
       <div class="preview-word" id="pvWord"></div>
       <div class="preview-pron" id="pvPron"></div>
+      <div class="preview-meaning-field">
+        <div class="preview-meaning-label" id="pvMeaningKoLabel">🇰🇷 한국어 뜻 (자동 번역 — 다르면 고쳐주세요)</div>
+        <input type="text" id="pvMeaningKoInput" class="preview-meaning-input" placeholder="한국어 뜻">
+      </div>
       <div class="preview-meaning" id="pvMeaning"></div>
       <div class="preview-example" id="pvExample"></div>
       <div class="preview-actions">
@@ -387,6 +449,89 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     </div>
 
     <div id="reviewContent"><div class="loading">불러오는 중...</div></div>
+  </div>
+
+  <!-- 테스트 -->
+  <div id="section-test" style="display:none">
+    <div id="testSetupArea">
+      <div class="test-setup-box">
+        <h3>🧪 단어 테스트</h3>
+
+        <div class="test-mode-toggle">
+          <div class="test-mode-btn active" id="testModeBtn-single" onclick="setTestRangeMode('single')">📅 특정 날짜</div>
+          <div class="test-mode-btn" id="testModeBtn-range" onclick="setTestRangeMode('range')">🎲 기간 랜덤</div>
+        </div>
+
+        <div id="testSingleDateField" class="test-field">
+          <div class="test-field-label">날짜 선택</div>
+          <div class="cal-wrap" style="width:100%;flex:none;box-sizing:border-box;">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="testCalPrev()">‹</button>
+              <div class="cal-month-label" id="testCalMonthLabel"></div>
+              <button class="cal-nav-btn" onclick="testCalNext()">›</button>
+            </div>
+            <div class="cal-dow-row" id="testCalDowRow"></div>
+            <div class="cal-grid" id="testCalGrid"></div>
+          </div>
+          <div class="test-count-hint" id="testSingleDateHint"></div>
+        </div>
+
+        <div id="testRangeDateField" class="test-field" style="display:none">
+          <div class="test-field-label">기간 선택 (날짜를 두 번 눌러 시작~끝 지정)</div>
+          <div class="cal-wrap" style="width:100%;flex:none;box-sizing:border-box;">
+            <div class="cal-nav">
+              <button class="cal-nav-btn" onclick="testRangeCalPrev()">‹</button>
+              <div class="cal-month-label" id="testRangeCalMonthLabel"></div>
+              <button class="cal-nav-btn" onclick="testRangeCalNext()">›</button>
+            </div>
+            <div class="cal-dow-row" id="testRangeCalDowRow"></div>
+            <div class="cal-grid" id="testRangeCalGrid"></div>
+          </div>
+          <div class="test-count-hint" id="testRangeHint"></div>
+          <div class="test-field-label" style="margin-top:12px">테스트할 단어 수</div>
+          <input type="number" class="test-num-input" id="testRangeCount" min="1" value="25">
+        </div>
+
+        <div class="test-field">
+          <div class="test-field-label">테스트 방식</div>
+          <div class="test-dir-row">
+            <div class="test-dir-btn active" id="testDirBtn-w2m" onclick="setTestDirection('w2m')">단어 → 뜻</div>
+            <div class="test-dir-btn" id="testDirBtn-m2w" onclick="setTestDirection('m2w')">뜻 → 단어</div>
+            <div class="test-dir-btn" id="testDirBtn-mixed" onclick="setTestDirection('mixed')">랜덤 섞어서</div>
+          </div>
+        </div>
+
+        <button class="test-start-btn" id="testStartBtn" onclick="startTest()">▶️ 테스트 시작</button>
+        <button class="btn" id="testDocBtn" style="width:100%;margin-top:8px;background:var(--surface);border:1px solid var(--border);color:var(--muted)" onclick="downloadTestDoc()">📄 시험지 Word로 다운로드 (정답지 포함)</button>
+      </div>
+    </div>
+
+    <div id="testQuizArea" style="display:none">
+      <div class="test-quiz-box">
+        <div class="test-progress" id="testProgress"></div>
+        <div class="test-progress-bar"><div class="test-progress-fill" id="testProgressFill" style="width:0%"></div></div>
+        <div class="test-prompt-label" id="testPromptLabel"></div>
+        <div class="test-prompt" id="testPrompt"></div>
+        <input type="text" class="test-answer-input" id="testAnswerInput" placeholder="정답을 입력하세요" autocomplete="off" onkeydown="if(event.key==='Enter')handleTestEnter()">
+        <div class="test-feedback" id="testFeedback"></div>
+        <button class="test-action-btn" id="testActionBtn" onclick="handleTestEnter()">확인</button>
+        <div class="test-quit-link" onclick="quitTest()">테스트 그만두기</div>
+      </div>
+    </div>
+
+    <div id="testSummaryArea" style="display:none">
+      <div class="test-summary-box">
+        <div class="test-summary-label">테스트 결과</div>
+        <div class="test-summary-score" id="testSummaryScore"></div>
+        <div class="test-summary-label" id="testSummarySub"></div>
+        <div class="test-summary-actions">
+          <button class="btn" id="testRetryBtn" onclick="restartSameTest()" style="flex:1">🔄 같은 조건으로 다시</button>
+          <button class="btn" id="testWrongOnlyBtn" onclick="retryWrongOnly()" style="flex:1">❌ 틀린 것만 다시</button>
+        </div>
+        <div class="test-wrong-list" id="testWrongList"></div>
+        <button class="test-action-btn" id="testBackBtn" onclick="backToTestSetup()" style="margin-top:10px">⚙️ 설정으로 돌아가기</button>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -551,6 +696,13 @@ window.switchUser = async function(user) {
   document.getElementById('inputWord').value = '';
   pendingWord = null;
 
+  // 테스트 상태 초기화
+  testQueue = []; testWrongList = []; testLastConfig = null; testSelectedDate = null; testCalYear = null; testCalMonth = null;
+  testRangeStart = null; testRangeEnd = null; testRangeCalYear = null; testRangeCalMonth = null;
+  document.getElementById('testQuizArea').style.display = 'none';
+  document.getElementById('testSummaryArea').style.display = 'none';
+  document.getElementById('testSetupArea').style.display = 'block';
+
   await loadWords();
 };
 
@@ -558,13 +710,14 @@ window.switchUser = async function(user) {
 window.switchMenu = function(menu) {
   currentMenu = menu;
   const cfg = USER_CONFIG[currentUser];
-  ['wordbook','flashcard','review'].forEach(m => {
+  ['wordbook','flashcard','review','test'].forEach(m => {
     document.getElementById(`section-${m}`).style.display = m===menu ? 'block' : 'none';
     const t = document.getElementById(`menuTab-${m}`);
     t.classList.remove('active','yujin-active','seoyun-active');
     if (m===menu) { t.classList.add('active', cfg.menuClass); }
   });
   if (menu==='review') { renderCalendar(); renderStatPanel(); renderReview(); }
+  if (menu==='test') { backToTestSetup(); renderTestSetup(); }
 };
 
 // ── 단어 불러오기 ──
@@ -583,6 +736,7 @@ async function loadWords() {
     renderCard();
     renderStatPanel();
     renderReview();
+    renderTestSetup();
     // 영문 설명 없는 단어 있으면 버튼 표시
 
   } catch(e) {
@@ -706,17 +860,31 @@ Return ONLY the definition text, nothing else.`
       }
     } catch(aiErr) { console.log('AI definition 실패, 사전 뜻 사용'); }
 
-    pendingWord = { word, pronunciation: phonetic, meaning: '', meaningEn, example, exampleKo: '', partOfSpeech: pos, etymology: '' };
+    // 한국어 뜻 자동 번역 (무료, MyMemory API)
+    let meaningKo = '';
+    try {
+      const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|ko`);
+      if (trRes.ok) {
+        const trData = await trRes.json();
+        meaningKo = trData?.responseData?.translatedText || '';
+        // 번역 실패/오류 문구가 그대로 오는 경우 걸러내기
+        if (/^(no |invalid|please)/i.test(meaningKo)) meaningKo = '';
+      }
+    } catch(trErr) { console.log('번역 실패'); }
+
+    pendingWord = { word, pronunciation: phonetic, meaning: meaningKo, meaningEn, example, exampleKo: '', partOfSpeech: pos, etymology: '' };
     document.getElementById('pvWord').textContent = word;
     document.getElementById('pvPron').textContent = phonetic || '';
+    document.getElementById('pvMeaningKoInput').value = meaningKo;
     document.getElementById('pvMeaning').textContent = meaningEn || '뜻 없음';
     document.getElementById('pvExample').textContent = example ? `"${example}"` : '';
     document.getElementById('previewBox').classList.add('show');
-    status.textContent = '⚠️ 한국어 뜻은 직접 입력해주세요!';
+    status.textContent = meaningKo ? '✅ 번역 초안이에요. 확인하고 저장해주세요!' : '⚠️ 자동 번역 실패 — 한국어 뜻을 직접 입력해주세요';
   } catch(e) {
     pendingWord = { word, pronunciation:'', meaning:'', meaningEn:'', example:'', exampleKo:'', partOfSpeech:'', etymology:'' };
     document.getElementById('pvWord').textContent = word;
     document.getElementById('pvPron').textContent = '';
+    document.getElementById('pvMeaningKoInput').value = '';
     document.getElementById('pvMeaning').textContent = '사전에서 찾지 못했어요';
     document.getElementById('pvExample').textContent = '';
     document.getElementById('previewBox').classList.add('show');
@@ -731,6 +899,7 @@ Return ONLY the definition text, nothing else.`
 window.cancelPreview = function() {
   document.getElementById('previewBox').classList.remove('show');
   document.getElementById('addStatus').textContent = '';
+  document.getElementById('pvMeaningKoInput').value = '';
   pendingWord = null;
 };
 
@@ -738,6 +907,7 @@ window.saveWord = async function() {
   if (!pendingWord) return;
   const cfg = USER_CONFIG[currentUser];
   const status = document.getElementById('addStatus');
+  pendingWord.meaning = document.getElementById('pvMeaningKoInput').value.trim();
   status.textContent = '저장 중...';
   try {
     const savedWord = pendingWord.word;
@@ -1277,6 +1447,410 @@ window.autoFillAll = async function() {
   } else {
     btn.textContent = `✨ 자동 채우기 (${remaining}개 남음)`;
   }
+};
+
+// ══════════════════════════════════════
+// ── 테스트 탭 ──
+// ══════════════════════════════════════
+let testRangeMode = 'single';   // 'single' | 'range'
+let testDirection = 'w2m';      // 'w2m' | 'm2w' | 'mixed'
+let testQueue = [];
+let testIndex = 0;
+let testScore = 0;
+let testWrongList = [];
+let testAnswered = false;
+let testLastConfig = null; // 같은 조건으로 다시 하기용
+let testCalYear, testCalMonth, testSelectedDate = null;
+let testRangeCalYear, testRangeCalMonth, testRangeStart = null, testRangeEnd = null;
+
+window.setTestRangeMode = function(mode) {
+  testRangeMode = mode;
+  document.getElementById('testModeBtn-single').classList.toggle('active', mode==='single');
+  document.getElementById('testModeBtn-range').classList.toggle('active', mode==='range');
+  document.getElementById('testSingleDateField').style.display = mode==='single' ? 'block' : 'none';
+  document.getElementById('testRangeDateField').style.display = mode==='range' ? 'block' : 'none';
+  updateTestRangeHint();
+};
+
+window.setTestDirection = function(dir) {
+  testDirection = dir;
+  ['w2m','m2w','mixed'].forEach(d => {
+    document.getElementById(`testDirBtn-${d}`).classList.toggle('active', d===dir);
+  });
+};
+
+function updateTestRangeHint() {
+  const hint = document.getElementById('testRangeHint');
+  if (!testRangeStart || !testRangeEnd) { hint.textContent = '시작 날짜와 끝 날짜를 순서대로 눌러주세요'; return; }
+  const count = words.filter(w => w.addedDate >= testRangeStart && w.addedDate <= testRangeEnd).length;
+  hint.textContent = `📅 ${testRangeStart} ~ ${testRangeEnd} · ${count}개 단어`;
+}
+
+function renderTestCalendar() {
+  const now = new Date(new Date().getTime() + 9*60*60*1000);
+  if (!testCalYear) { testCalYear = now.getFullYear(); testCalMonth = now.getMonth(); }
+  const grouped = getGrouped();
+  const label = document.getElementById('testCalMonthLabel');
+  label.textContent = `${testCalYear}.${String(testCalMonth+1).padStart(2,'0')}`;
+  const grid = document.getElementById('testCalGrid');
+  const todayStr = now.toISOString().split('T')[0];
+  const firstDay = new Date(testCalYear, testCalMonth, 1).getDay();
+  const lastDate = new Date(testCalYear, testCalMonth+1, 0).getDate();
+
+  const dows = ['일','월','화','수','목','금','토'];
+  document.getElementById('testCalDowRow').innerHTML =
+    dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  let html = '';
+  for(let i=0;i<firstDay;i++) html += `<div class="cal-day empty"></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const dateStr = `${testCalYear}-${String(testCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasWords = grouped[dateStr]?.length > 0;
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === testSelectedDate;
+    const cls = ['cal-day', hasWords?'has-words':'', isToday?'today':'', isSelected?'selected':''].filter(Boolean).join(' ');
+    const dot = hasWords ? '<span class="dot-mark"></span>' : '';
+    html += `<div class="${cls}" ${hasWords ? `onclick="selectTestDate('${dateStr}')"` : ''}>${d}${dot}</div>`;
+  }
+  grid.innerHTML = html;
+
+  const hint = document.getElementById('testSingleDateHint');
+  if (testSelectedDate && grouped[testSelectedDate]) {
+    hint.textContent = `📅 ${testSelectedDate} · ${grouped[testSelectedDate].length}개 단어`;
+  } else {
+    hint.textContent = '초록 점이 있는 날짜를 눌러 선택하세요';
+  }
+}
+
+window.testCalPrev = function() { testCalMonth--; if(testCalMonth<0){testCalMonth=11;testCalYear--;} renderTestCalendar(); };
+window.testCalNext = function() { testCalMonth++; if(testCalMonth>11){testCalMonth=0;testCalYear++;} renderTestCalendar(); };
+
+window.selectTestDate = function(date) {
+  testSelectedDate = testSelectedDate===date ? null : date;
+  renderTestCalendar();
+};
+
+function renderTestRangeCalendar() {
+  const now = new Date(new Date().getTime() + 9*60*60*1000);
+  if (!testRangeCalYear) { testRangeCalYear = now.getFullYear(); testRangeCalMonth = now.getMonth(); }
+  const grouped = getGrouped();
+  document.getElementById('testRangeCalMonthLabel').textContent = `${testRangeCalYear}.${String(testRangeCalMonth+1).padStart(2,'0')}`;
+  const grid = document.getElementById('testRangeCalGrid');
+  const todayStr = now.toISOString().split('T')[0];
+  const firstDay = new Date(testRangeCalYear, testRangeCalMonth, 1).getDay();
+  const lastDate = new Date(testRangeCalYear, testRangeCalMonth+1, 0).getDate();
+
+  const dows = ['일','월','화','수','목','금','토'];
+  document.getElementById('testRangeCalDowRow').innerHTML =
+    dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  let html = '';
+  for(let i=0;i<firstDay;i++) html += `<div class="cal-day empty"></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const dateStr = `${testRangeCalYear}-${String(testRangeCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasWords = grouped[dateStr]?.length > 0;
+    const isToday = dateStr === todayStr;
+    const isEdge = dateStr === testRangeStart || dateStr === testRangeEnd;
+    const isInRange = testRangeStart && testRangeEnd && dateStr > testRangeStart && dateStr < testRangeEnd;
+    const cls = ['cal-day', hasWords?'has-words':'', isToday && !isEdge?'today':'', isEdge?'range-edge':'', isInRange?'in-range':''].filter(Boolean).join(' ');
+    const dot = hasWords ? '<span class="dot-mark"></span>' : '';
+    html += `<div class="${cls}" onclick="selectTestRangeDate('${dateStr}')">${d}${dot}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+window.testRangeCalPrev = function() { testRangeCalMonth--; if(testRangeCalMonth<0){testRangeCalMonth=11;testRangeCalYear--;} renderTestRangeCalendar(); };
+window.testRangeCalNext = function() { testRangeCalMonth++; if(testRangeCalMonth>11){testRangeCalMonth=0;testRangeCalYear++;} renderTestRangeCalendar(); };
+
+window.selectTestRangeDate = function(date) {
+  if (!testRangeStart || (testRangeStart && testRangeEnd)) {
+    testRangeStart = date; testRangeEnd = null;
+  } else if (date < testRangeStart) {
+    testRangeEnd = testRangeStart; testRangeStart = date;
+  } else {
+    testRangeEnd = date;
+  }
+  renderTestRangeCalendar();
+  updateTestRangeHint();
+};
+
+function renderTestSetup() {
+  const grouped = getGrouped();
+  const dates = Object.keys(grouped).filter(d => d !== '날짜 없음').sort((a,b) => b.localeCompare(a));
+
+  // 아직 날짜를 선택 안 했으면 가장 최근 단어 추가일로 달력 위치 잡기
+  if (dates.length && !testSelectedDate) {
+    const [y, m] = dates[0].split('-').map(Number);
+    testCalYear = y; testCalMonth = m - 1;
+  }
+  renderTestCalendar();
+
+  // 기간 기본값: 가장 이른 날짜 ~ 가장 최근 날짜
+  if (dates.length && !testRangeStart && !testRangeEnd) {
+    testRangeStart = dates[dates.length-1];
+    testRangeEnd = dates[0];
+    const [y, m] = testRangeEnd.split('-').map(Number);
+    testRangeCalYear = y; testRangeCalMonth = m - 1;
+  }
+  renderTestRangeCalendar();
+  updateTestRangeHint();
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+window.startTest = function() {
+  let pool = [];
+  if (testRangeMode === 'single') {
+    const date = testSelectedDate;
+    if (!date) { showToast('테스트할 날짜를 달력에서 선택해주세요'); return; }
+    pool = words.filter(w => w.addedDate === date);
+  } else {
+    const from = testRangeStart;
+    const to = testRangeEnd;
+    if (!from || !to) { showToast('기간을 선택해주세요'); return; }
+    pool = words.filter(w => w.addedDate >= from && w.addedDate <= to);
+    const count = parseInt(document.getElementById('testRangeCount').value) || 25;
+    pool = shuffleArray(pool).slice(0, count);
+  }
+  pool = pool.filter(w => w.meaning);
+  if (!pool.length) { showToast('테스트할 단어가 없어요 (한국어 뜻이 있어야 해요)'); return; }
+
+  testLastConfig = { pool: [...pool], direction: testDirection };
+  buildTestQueue(pool, testDirection);
+};
+
+// ── 시험지 Word(.doc) 다운로드 ──
+window.downloadTestDoc = function() {
+  let pool = [];
+  if (testRangeMode === 'single') {
+    if (!testSelectedDate) { showToast('먼저 달력에서 날짜를 선택해주세요'); return; }
+    pool = words.filter(w => w.addedDate === testSelectedDate);
+  } else {
+    if (!testRangeStart || !testRangeEnd) { showToast('먼저 기간을 선택해주세요'); return; }
+    pool = words.filter(w => w.addedDate >= testRangeStart && w.addedDate <= testRangeEnd);
+    const count = parseInt(document.getElementById('testRangeCount').value) || 25;
+    pool = shuffleArray(pool).slice(0, count);
+  }
+  pool = pool.filter(w => w.meaning);
+  if (!pool.length) { showToast('시험지를 만들 단어가 없어요'); return; }
+
+  const items = shuffleArray(pool).map(w => {
+    let dir = testDirection;
+    if (dir === 'mixed') dir = Math.random() < 0.5 ? 'w2m' : 'm2w';
+    return { word: w, dir };
+  });
+
+  const cfg = USER_CONFIG[currentUser];
+  const now = new Date(new Date().getTime() + 9*60*60*1000);
+  const dateStr = now.toISOString().split('T')[0];
+  const rangeLabel = testRangeMode === 'single' ? testSelectedDate : `${testRangeStart} ~ ${testRangeEnd}`;
+  const dirLabel = { w2m:'단어 → 뜻', m2w:'뜻 → 단어', mixed:'랜덤 섞어서' }[testDirection];
+
+  const qRows = items.map((item, i) => {
+    const prompt = item.dir === 'w2m' ? item.word.word : item.word.meaning;
+    const promptStyle = item.dir === 'w2m' ? "font-family:'DM Sans',Arial,sans-serif;" : "";
+    return `<tr>
+      <td style="width:34px;padding:10px 4px;font-size:13px;color:#888;">${i+1}.</td>
+      <td style="padding:10px 4px;font-size:15px;font-weight:bold;${promptStyle}">${prompt}</td>
+      <td style="padding:10px 4px;border-bottom:1px solid #333;width:260px;">&nbsp;</td>
+    </tr>`;
+  }).join('');
+
+  const aRows = items.map((item, i) => {
+    const prompt = item.dir === 'w2m' ? item.word.word : item.word.meaning;
+    const answer = item.dir === 'w2m' ? item.word.meaning : item.word.word;
+    return `<tr>
+      <td style="width:34px;padding:6px 4px;font-size:12px;color:#888;">${i+1}.</td>
+      <td style="padding:6px 4px;font-size:13px;color:#555;">${prompt}</td>
+      <td style="padding:6px 4px;font-size:13px;font-weight:bold;">${answer}</td>
+    </tr>`;
+  }).join('');
+
+  const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>${cfg.name} 단어 시험지</title>
+<style>
+  body { font-family: '맑은 고딕', 'Malgun Gothic', sans-serif; color:#222; }
+  h1 { font-size:21px; margin:0 0 4px; }
+  .sub { font-size:12px; color:#666; margin-bottom:6px; }
+  .name-line { font-size:13px; margin-bottom:18px; }
+  table { border-collapse: collapse; width:100%; }
+</style>
+</head>
+<body>
+  <h1>📚 ${cfg.name} 단어 시험지</h1>
+  <div class="sub">${rangeLabel} · ${dirLabel} · 총 ${items.length}문항 · 생성일 ${dateStr}</div>
+  <div class="name-line">이름: ______________________ &nbsp;&nbsp;&nbsp; 점수: _______ / ${items.length}</div>
+  <table>${qRows}</table>
+
+  <br clear="all" style="mso-special-character:line-break;page-break-before:always">
+  <h1>✅ 정답지</h1>
+  <div class="sub">${rangeLabel} · ${dirLabel}</div>
+  <table>${aRows}</table>
+</body></html>`;
+
+  const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${cfg.name}_단어시험지_${dateStr}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast('시험지가 다운로드됐어요!');
+};
+
+function buildTestQueue(pool, direction) {
+  testQueue = shuffleArray(pool).map(w => {
+    let dir = direction;
+    if (direction === 'mixed') dir = Math.random() < 0.5 ? 'w2m' : 'm2w';
+    return { word: w, dir };
+  });
+  testIndex = 0;
+  testScore = 0;
+  testWrongList = [];
+  document.getElementById('testSetupArea').style.display = 'none';
+  document.getElementById('testSummaryArea').style.display = 'none';
+  document.getElementById('testQuizArea').style.display = 'block';
+  renderTestQuestion();
+}
+
+function renderTestQuestion() {
+  const total = testQueue.length;
+  const cur = testQueue[testIndex];
+  document.getElementById('testProgress').textContent = `${testIndex+1} / ${total}   ·   ✅ ${testScore}`;
+  document.getElementById('testProgressFill').style.width = `${(testIndex/total)*100}%`;
+
+  const promptLabel = document.getElementById('testPromptLabel');
+  const prompt = document.getElementById('testPrompt');
+  if (cur.dir === 'w2m') {
+    promptLabel.textContent = '이 단어의 뜻은?';
+    prompt.textContent = cur.word.word;
+    prompt.classList.add('is-word');
+  } else {
+    promptLabel.textContent = '이 뜻에 맞는 단어는?';
+    prompt.textContent = cur.word.meaning;
+    prompt.classList.remove('is-word');
+  }
+
+  const input = document.getElementById('testAnswerInput');
+  input.value = '';
+  input.classList.remove('correct','wrong');
+  input.disabled = false;
+  input.focus();
+  document.getElementById('testFeedback').textContent = '';
+  document.getElementById('testFeedback').className = 'test-feedback';
+  document.getElementById('testActionBtn').textContent = '확인';
+  testAnswered = false;
+}
+
+function normalizeAnswer(str, isKorean) {
+  if (!str) return '';
+  let s = str.trim().toLowerCase();
+  if (isKorean) s = s.replace(/\s+/g, '');
+  return s;
+}
+
+function checkTestAnswer() {
+  const cur = testQueue[testIndex];
+  const input = document.getElementById('testAnswerInput');
+  const given = input.value;
+  let isCorrect = false;
+
+  if (cur.dir === 'w2m') {
+    // 한글 뜻 맞추기 — 콤마/슬래시로 나뉜 동의어 중 하나만 맞아도 정답 처리
+    const correctTokens = cur.word.meaning.split(/[,\/·、]/).map(t => normalizeAnswer(t, true)).filter(Boolean);
+    const givenNorm = normalizeAnswer(given, true);
+    isCorrect = correctTokens.some(t => t === givenNorm || (givenNorm.length>=2 && (t.includes(givenNorm) || givenNorm.includes(t))));
+  } else {
+    // 영단어 맞추기
+    isCorrect = normalizeAnswer(given, false) === normalizeAnswer(cur.word.word, false);
+  }
+
+  const feedback = document.getElementById('testFeedback');
+  input.classList.add(isCorrect ? 'correct' : 'wrong');
+  input.disabled = true;
+  testAnswered = true;
+
+  if (isCorrect) {
+    testScore++;
+    feedback.textContent = '✅ 정답이에요!';
+    feedback.className = 'test-feedback correct';
+  } else {
+    const correctAnswer = cur.dir === 'w2m' ? cur.word.meaning : cur.word.word;
+    feedback.textContent = `❌ 정답: ${correctAnswer}`;
+    feedback.className = 'test-feedback wrong';
+    testWrongList.push({ word: cur.word, given, dir: cur.dir });
+  }
+  document.getElementById('testProgressFill').style.width = `${((testIndex+1)/testQueue.length)*100}%`;
+  document.getElementById('testActionBtn').textContent = testIndex+1 < testQueue.length ? '다음 →' : '결과 보기';
+}
+
+window.handleTestEnter = function() {
+  if (!testAnswered) {
+    checkTestAnswer();
+  } else {
+    testIndex++;
+    if (testIndex < testQueue.length) {
+      renderTestQuestion();
+    } else {
+      renderTestSummary();
+    }
+  }
+};
+
+window.quitTest = function() {
+  if (!confirm('테스트를 그만두시겠어요? 지금까지 결과는 저장되지 않아요.')) return;
+  backToTestSetup();
+};
+
+function renderTestSummary() {
+  document.getElementById('testQuizArea').style.display = 'none';
+  document.getElementById('testSummaryArea').style.display = 'block';
+  const total = testQueue.length;
+  document.getElementById('testSummaryScore').textContent = `${testScore} / ${total}`;
+  const pct = Math.round((testScore/total)*100);
+  document.getElementById('testSummarySub').textContent = `정답률 ${pct}%`;
+
+  const wrongListEl = document.getElementById('testWrongList');
+  document.getElementById('testWrongOnlyBtn').style.display = testWrongList.length ? 'block' : 'none';
+  if (!testWrongList.length) {
+    wrongListEl.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:13px;padding:8px">전부 맞았어요! 🎉</div>`;
+  } else {
+    wrongListEl.innerHTML = testWrongList.map(item => `
+      <div class="test-wrong-row">
+        <span class="test-wrong-word">${item.word.word}</span>
+        <span class="test-wrong-meaning">${item.word.meaning}</span>
+        <span class="test-wrong-given">내 답: ${item.given || '(빈칸)'}</span>
+      </div>
+    `).join('');
+  }
+}
+
+window.restartSameTest = function() {
+  if (!testLastConfig) return;
+  buildTestQueue(testLastConfig.pool, testLastConfig.direction);
+};
+
+window.retryWrongOnly = function() {
+  if (!testWrongList.length) return;
+  const pool = testWrongList.map(item => item.word);
+  buildTestQueue(pool, testDirection);
+};
+
+window.backToTestSetup = function() {
+  document.getElementById('testQuizArea').style.display = 'none';
+  document.getElementById('testSummaryArea').style.display = 'none';
+  document.getElementById('testSetupArea').style.display = 'block';
 };
 
 // ── Toast ──
