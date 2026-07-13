@@ -1653,25 +1653,26 @@ window.downloadTestDoc = function() {
   const rangeLabel = testRangeMode === 'single' ? testSelectedDate : `${testRangeStart} ~ ${testRangeEnd}`;
   const dirLabel = { w2m:'단어 → 뜻', m2w:'뜻 → 단어', mixed:'랜덤 섞어서' }[testDirection];
 
-  const qRows = items.map((item, i) => {
+  // 한 줄에 두 문제씩 (2단 레이아웃)
+  function buildQCell(item, idx) {
+    if (!item) return `<td style="width:24px"></td><td></td><td style="width:140px"></td>`;
     const prompt = item.dir === 'w2m' ? item.word.word : item.word.meaning;
     const promptStyle = item.dir === 'w2m' ? "font-family:'DM Sans',Arial,sans-serif;" : "";
-    return `<tr>
-      <td style="width:34px;padding:10px 4px;font-size:13px;color:#888;">${i+1}.</td>
-      <td style="padding:10px 4px;font-size:15px;font-weight:bold;${promptStyle}">${prompt}</td>
-      <td style="padding:10px 4px;border-bottom:1px solid #333;width:260px;">&nbsp;</td>
-    </tr>`;
-  }).join('');
-
-  const aRows = items.map((item, i) => {
+    return `<td style="width:24px;padding:9px 4px;font-size:12px;color:#888;">${idx+1}.</td><td style="padding:9px 6px;font-size:14px;font-weight:bold;${promptStyle}">${prompt}</td><td style="padding:9px 4px;border-bottom:1px solid #333;width:140px;">&nbsp;</td>`;
+  }
+  function buildACell(item, idx) {
+    if (!item) return `<td style="width:24px"></td><td></td><td></td>`;
     const prompt = item.dir === 'w2m' ? item.word.word : item.word.meaning;
     const answer = item.dir === 'w2m' ? item.word.meaning : item.word.word;
-    return `<tr>
-      <td style="width:34px;padding:6px 4px;font-size:12px;color:#888;">${i+1}.</td>
-      <td style="padding:6px 4px;font-size:13px;color:#555;">${prompt}</td>
-      <td style="padding:6px 4px;font-size:13px;font-weight:bold;">${answer}</td>
-    </tr>`;
-  }).join('');
+    return `<td style="width:24px;padding:6px 4px;font-size:11px;color:#888;">${idx+1}.</td><td style="padding:6px 4px;font-size:12px;color:#555;">${prompt}</td><td style="padding:6px 4px;font-size:12px;font-weight:bold;">${answer}</td>`;
+  }
+
+  let qRows = '';
+  let aRows = '';
+  for (let i = 0; i < items.length; i += 2) {
+    qRows += `<tr>${buildQCell(items[i], i)}<td style="width:18px;border-left:1px solid #ddd;"></td>${buildQCell(items[i+1], i+1)}</tr>`;
+    aRows += `<tr>${buildACell(items[i], i)}<td style="width:18px;border-left:1px solid #ddd;"></td>${buildACell(items[i+1], i+1)}</tr>`;
+  }
 
   const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
 <head>
