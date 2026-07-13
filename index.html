@@ -62,6 +62,25 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 /* ── Main ── */
 .main { max-width: 640px; margin: 0 auto; padding: 20px 16px 60px; }
 
+/* ── 테스트 기록 탭 ── */
+.history-empty { text-align:center; color:var(--muted); font-size:14px; padding:40px 0; }
+.history-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow); cursor: pointer; }
+.history-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.history-date { font-size:13px; font-weight:700; color:var(--text); }
+.history-score { font-family:'DM Sans',sans-serif; font-weight:700; font-size:16px; }
+.history-score.good { color:#2c6e49; }
+.history-score.mid { color:#b5670a; }
+.history-score.bad { color:#c0392b; }
+.history-meta { font-size:12px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; }
+.history-detail { display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.history-detail.show { display:block; }
+.history-detail-row { display:flex; align-items:center; gap:10px; padding:8px 10px; background: var(--bg); border-radius: 8px; margin-bottom:6px; font-size:13px; }
+.history-detail-word { font-family:'DM Sans',sans-serif; font-weight:700; min-width:90px; }
+.history-detail-meaning { color:var(--muted); flex:1; }
+.history-detail-given { color:#c0392b; font-size:12px; }
+.history-delete-btn { font-size:11px; color:var(--muted); text-decoration:underline; cursor:pointer; margin-top:8px; display:inline-block; }
+.wc-wrong-badge { font-size:11px; font-weight:700; color:#c0392b; background:#fdf3f3; padding:2px 8px; border-radius:20px; margin-left:6px; }
+
 /* ── Add Panel ── */
 .add-panel {
   background: var(--surface); border: 1px solid var(--border);
@@ -339,6 +358,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
   <div class="menu-tab" id="menuTab-flashcard" onclick="switchMenu('flashcard')">📇 플래시카드</div>
   <div class="menu-tab" id="menuTab-review" onclick="switchMenu('review')">📅 날짜별 기록</div>
   <div class="menu-tab" id="menuTab-test" onclick="switchMenu('test')">🧪 테스트</div>
+  <div class="menu-tab" id="menuTab-history" onclick="switchMenu('history')">🏆 테스트 기록</div>
 </div>
 
 <div class="main">
@@ -534,6 +554,11 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     </div>
   </div>
 
+  <!-- 테스트 기록 -->
+  <div id="section-history" style="display:none">
+    <div id="historyList"><div class="loading">불러오는 중...</div></div>
+  </div>
+
 </div>
 
 <!-- 중복 단어 팝업 모달 -->
@@ -612,7 +637,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp }
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, increment }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -636,12 +661,13 @@ let cardIndex = 0;
 let isFlipped = false;
 let pendingWord = null;
 let editingId = null;
+let testHistory = [];
 
 const USER_CONFIG = {
   yujin: {
     name: '유진이', emoji: '🌿',
     color: '#2c6e49', light: '#e8f3e6',
-    collection: 'words_yujin',
+    collection: 'words_yujin', resultsCollection: 'testResults_yujin',
     btnClass: 'btn-yujin', softClass: 'btn-yujin-soft',
     posClass: 'yujin-pos', meaningClass: 'yujin-meaning',
     exampleClass: 'yujin-example', labelClass: 'yujin-label',
@@ -650,7 +676,7 @@ const USER_CONFIG = {
   seoyun: {
     name: '서윤이', emoji: '💜',
     color: '#6b3fa0', light: '#f0e8fd',
-    collection: 'words_seoyun',
+    collection: 'words_seoyun', resultsCollection: 'testResults_seoyun',
     btnClass: 'btn-seoyun', softClass: 'btn-seoyun-soft',
     posClass: 'seoyun-pos', meaningClass: 'seoyun-meaning',
     exampleClass: 'seoyun-example', labelClass: 'seoyun-label',
@@ -704,13 +730,14 @@ window.switchUser = async function(user) {
   document.getElementById('testSetupArea').style.display = 'block';
 
   await loadWords();
+  if (currentMenu === 'history') renderHistory();
 };
 
 // ── 메뉴 전환 ──
 window.switchMenu = function(menu) {
   currentMenu = menu;
   const cfg = USER_CONFIG[currentUser];
-  ['wordbook','flashcard','review','test'].forEach(m => {
+  ['wordbook','flashcard','review','test','history'].forEach(m => {
     document.getElementById(`section-${m}`).style.display = m===menu ? 'block' : 'none';
     const t = document.getElementById(`menuTab-${m}`);
     t.classList.remove('active','yujin-active','seoyun-active');
@@ -718,6 +745,7 @@ window.switchMenu = function(menu) {
   });
   if (menu==='review') { renderCalendar(); renderStatPanel(); renderReview(); }
   if (menu==='test') { backToTestSetup(); renderTestSetup(); }
+  if (menu==='history') { renderHistory(); }
 };
 
 // ── 단어 불러오기 ──
@@ -944,6 +972,7 @@ function renderWordbook() {
       <div class="wc-top">
         <div class="wc-word">${w.word}</div>
         ${pos ? `<span class="wc-pos ${cfg.posClass}">${pos}</span>` : ''}
+        ${w.wrongCount ? `<span class="wc-wrong-badge">❌ ${w.wrongCount}회 틀림</span>` : ''}
       </div>
       <div class="wc-pron">
         <span>${w.pronunciation||''}</span>
@@ -1835,7 +1864,102 @@ function renderTestSummary() {
       </div>
     `).join('');
   }
+
+  saveTestResult(total, pct);
+  bumpWrongCounts();
 }
+
+// ── 테스트 기록 저장 ──
+async function saveTestResult(total, pct) {
+  const cfg = USER_CONFIG[currentUser];
+  const rangeLabel = testRangeMode === 'single' ? testSelectedDate : `${testRangeStart} ~ ${testRangeEnd}`;
+  const dirLabel = { w2m:'단어 → 뜻', m2w:'뜻 → 단어', mixed:'랜덤 섞어서' }[testDirection];
+  try {
+    await addDoc(collection(db, cfg.resultsCollection), {
+      score: testScore, total, pct,
+      rangeLabel, direction: testDirection, dirLabel,
+      wrongWords: testWrongList.map(item => ({ word: item.word.word, meaning: item.word.meaning || '', given: item.given || '' })),
+      createdAt: serverTimestamp(),
+      testedDate: new Date(new Date().getTime() + 9*60*60*1000).toISOString().split('T')[0]
+    });
+  } catch(e) { console.error('테스트 기록 저장 실패', e); }
+}
+
+// ── 틀린 단어 누적 카운트 ──
+async function bumpWrongCounts() {
+  const cfg = USER_CONFIG[currentUser];
+  for (const item of testWrongList) {
+    const id = item.word.id;
+    if (!id) continue;
+    try {
+      await updateDoc(doc(db, cfg.collection, id), { wrongCount: increment(1) });
+      const w = words.find(x => x.id === id);
+      if (w) w.wrongCount = (w.wrongCount || 0) + 1;
+    } catch(e) { console.error('오답 카운트 업데이트 실패', e); }
+  }
+  renderWordbook();
+}
+
+// ── 테스트 기록 불러오기/렌더 ──
+async function renderHistory() {
+  const cfg = USER_CONFIG[currentUser];
+  const el = document.getElementById('historyList');
+  el.innerHTML = '<div class="loading">불러오는 중...</div>';
+  try {
+    const q = query(collection(db, cfg.resultsCollection), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    testHistory = [];
+    snap.forEach(d => testHistory.push({ id: d.id, ...d.data() }));
+  } catch(e) {
+    console.error(e); el.innerHTML = '<div class="history-empty">불러오기 실패했어요</div>'; return;
+  }
+  if (!testHistory.length) {
+    el.innerHTML = `<div class="history-empty">🧪 아직 테스트 기록이 없어요<br>테스트를 보면 여기에 기록이 남아요!</div>`;
+    return;
+  }
+  el.innerHTML = testHistory.map(h => {
+    const scoreCls = h.pct >= 80 ? 'good' : h.pct >= 50 ? 'mid' : 'bad';
+    const wrongRows = (h.wrongWords||[]).length
+      ? h.wrongWords.map(w => `
+        <div class="history-detail-row">
+          <span class="history-detail-word">${w.word}</span>
+          <span class="history-detail-meaning">${w.meaning}</span>
+          <span class="history-detail-given">내 답: ${w.given || '(빈칸)'}</span>
+        </div>`).join('')
+      : `<div style="text-align:center;color:var(--muted);font-size:13px;padding:6px">전부 맞았어요! 🎉</div>`;
+    return `
+    <div class="history-card" onclick="toggleHistoryDetail('${h.id}')">
+      <div class="history-top">
+        <div class="history-date">📅 ${h.testedDate || ''}</div>
+        <div class="history-score ${scoreCls}">${h.score} / ${h.total} (${h.pct}%)</div>
+      </div>
+      <div class="history-meta">
+        <span>${h.rangeLabel || ''}</span>
+        <span>·</span>
+        <span>${h.dirLabel || ''}</span>
+      </div>
+      <div class="history-detail" id="historyDetail-${h.id}">
+        ${wrongRows}
+        <span class="history-delete-btn" onclick="event.stopPropagation(); deleteHistory('${h.id}')">🗑️ 이 기록 삭제</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleHistoryDetail = function(id) {
+  const el = document.getElementById(`historyDetail-${id}`);
+  if (el) el.classList.toggle('show');
+};
+
+window.deleteHistory = async function(id) {
+  if (!confirm('이 테스트 기록을 삭제할까요?')) return;
+  const cfg = USER_CONFIG[currentUser];
+  try {
+    await deleteDoc(doc(db, cfg.resultsCollection, id));
+    testHistory = testHistory.filter(h => h.id !== id);
+    renderHistory();
+  } catch(e) { console.error(e); showToast('삭제 실패'); }
+};
 
 window.restartSameTest = function() {
   if (!testLastConfig) return;
