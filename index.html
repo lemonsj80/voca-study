@@ -34,6 +34,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 .user-tabs {
   display: flex; background: var(--surface);
   border-bottom: 2px solid var(--border);
+  position: sticky; z-index: 99;
 }
 .user-tab {
   flex: 1; padding: 14px; text-align: center; cursor: pointer;
@@ -49,6 +50,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
   display: flex; background: var(--surface);
   border-bottom: 1px solid var(--border); padding: 0 16px;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
+  position: sticky; z-index: 98;
 }
 .menu-tab {
   padding: 10px 16px; font-size: 13px; cursor: pointer;
@@ -123,6 +125,28 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 
 /* ── 단어장 카드 ── */
 .wordbook-list { display: flex; flex-direction: column; gap: 16px; }
+.wb-cal-toggle-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.wb-cal-toggle-btn {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+  padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--text);
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.wb-cal-toggle-btn:hover { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.wb-cal-toggle-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+.wb-filter-badge {
+  display: flex; align-items: center; gap: 8px; background: var(--accent-light); color: var(--accent);
+  font-size: 12px; font-weight: 700; padding: 6px 8px 6px 14px; border-radius: 20px;
+}
+.wb-filter-badge button { border: none; background: rgba(255,255,255,0.6); color: var(--accent); width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 11px; line-height: 1; }
+#wbCalWrap { margin-bottom: 16px; }
+.wordbook-date-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 4px 2px; margin-top: 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.3px;
+}
+.wordbook-date-header:first-child { margin-top: 0; }
+.wordbook-date-count { font-size: 11px; font-weight: 600; color: var(--muted); background: var(--accent-light); padding: 2px 9px; border-radius: 20px; }
 .word-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 16px; padding: 22px 20px; box-shadow: var(--shadow); position: relative;
@@ -356,9 +380,9 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 <div class="menu-tabs">
   <div class="menu-tab active" id="menuTab-wordbook" onclick="switchMenu('wordbook')">📖 단어장</div>
   <div class="menu-tab" id="menuTab-flashcard" onclick="switchMenu('flashcard')">📇 플래시카드</div>
-  <div class="menu-tab" id="menuTab-review" onclick="switchMenu('review')">📅 날짜별 기록</div>
   <div class="menu-tab" id="menuTab-test" onclick="switchMenu('test')">🧪 테스트</div>
   <div class="menu-tab" id="menuTab-history" onclick="switchMenu('history')">🏆 테스트 기록</div>
+  <div class="menu-tab" id="menuTab-review" onclick="switchMenu('review')">📅 날짜별 기록</div>
 </div>
 
 <div class="main">
@@ -390,6 +414,22 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 
   <!-- 단어장 -->
   <div id="section-wordbook">
+    <div class="wb-cal-toggle-row">
+      <button class="wb-cal-toggle-btn" id="wbCalToggleBtn" onclick="toggleWbCalendar()">📅 날짜별로 보기</button>
+      <span class="wb-filter-badge" id="wbFilterBadge" style="display:none">
+        <span id="wbFilterLabel"></span>
+        <button onclick="clearWbDate()">✕</button>
+      </span>
+    </div>
+    <div class="cal-wrap" id="wbCalWrap" style="display:none">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="wbCalPrev()">‹</button>
+        <span class="cal-month-label" id="wbCalMonthLabel"></span>
+        <button class="cal-nav-btn" onclick="wbCalNext()">›</button>
+      </div>
+      <div class="cal-dow-row" id="wbCalDowRow"></div>
+      <div class="cal-grid" id="wbCalGrid"></div>
+    </div>
     <div class="wordbook-list" id="wordbookList"><div class="loading">불러오는 중...</div></div>
   </div>
 
@@ -729,6 +769,12 @@ window.switchUser = async function(user) {
   document.getElementById('testSummaryArea').style.display = 'none';
   document.getElementById('testSetupArea').style.display = 'block';
 
+  // 단어장 날짜 필터 초기화
+  wbSelectedDate = null; wbCalYear = null; wbCalMonth = null; wbCalOpen = false;
+  document.getElementById('wbCalWrap').style.display = 'none';
+  document.getElementById('wbCalToggleBtn').classList.remove('active');
+  document.getElementById('wbFilterBadge').style.display = 'none';
+
   await loadWords();
   if (currentMenu === 'history') renderHistory();
 };
@@ -765,6 +811,7 @@ async function loadWords() {
     renderStatPanel();
     renderReview();
     renderTestSetup();
+    if (wbCalOpen) renderWbCalendar();
     // 영문 설명 없는 단어 있으면 버튼 표시
 
   } catch(e) {
@@ -955,19 +1002,42 @@ window.saveWord = async function() {
 // ── 단어장 렌더 ──
 function renderWordbook() {
   const el = document.getElementById('wordbookList');
-  if (!words.length) {
-    el.innerHTML = `<div class="empty"><div class="empty-icon">📖</div>단어를 추가해보세요!</div>`;
+  const badge = document.getElementById('wbFilterBadge');
+  const badgeLabel = document.getElementById('wbFilterLabel');
+
+  const list = wbSelectedDate ? words.filter(w => (w.addedDate||'날짜 없음') === wbSelectedDate) : words;
+
+  if (wbSelectedDate) {
+    badge.style.display = 'flex';
+    badgeLabel.textContent = `📅 ${wbSelectedDate} · ${list.length}개`;
+  } else {
+    badge.style.display = 'none';
+  }
+
+  if (!list.length) {
+    el.innerHTML = wbSelectedDate
+      ? `<div class="empty"><div class="empty-icon">📭</div>이 날은 저장한 단어가 없어요</div>`
+      : `<div class="empty"><div class="empty-icon">📖</div>단어를 추가해보세요!</div>`;
     return;
   }
   const cfg = USER_CONFIG[currentUser];
   const itemClass = { known:'known', unsure:'unsure', unknown:'unknown', new:'' };
   const posMap = { noun:'명사', verb:'동사', adjective:'형용사', adverb:'부사', preposition:'전치사', conjunction:'접속사' };
 
-  el.innerHTML = words.map(w => {
+  let lastDate = null;
+  el.innerHTML = list.map(w => {
     const pos = posMap[w.partOfSpeech] || w.partOfSpeech || '';
     let exHtml = w.example || '';
     if (exHtml) { const re = new RegExp(`(${w.word}[a-z]*)`, 'gi'); exHtml = exHtml.replace(re, '<mark>$1</mark>'); }
+    const dateKey = w.addedDate || '날짜 없음';
+    let dateHeader = '';
+    if (dateKey !== lastDate) {
+      lastDate = dateKey;
+      const count = list.filter(x => (x.addedDate||'날짜 없음') === dateKey).length;
+      dateHeader = `<div class="wordbook-date-header"><span>📅 ${dateKey}</span><span class="wordbook-date-count">${count}개</span></div>`;
+    }
     return `
+    ${dateHeader}
     <div class="word-card ${itemClass[w.status||'new']}" data-word-id="${w.id}">
       <div class="wc-top">
         <div class="wc-word">${w.word}</div>
@@ -1007,6 +1077,58 @@ function renderWordbook() {
     </div>`;
   }).join('');
 }
+
+// ── 단어장 탭: 날짜별 캘린더 ──
+window.toggleWbCalendar = function() {
+  wbCalOpen = !wbCalOpen;
+  document.getElementById('wbCalWrap').style.display = wbCalOpen ? 'block' : 'none';
+  document.getElementById('wbCalToggleBtn').classList.toggle('active', wbCalOpen);
+  if (wbCalOpen) renderWbCalendar();
+};
+
+function renderWbCalendar() {
+  const now = new Date(new Date().getTime() + 9*60*60*1000);
+  if (!wbCalYear) { wbCalYear = now.getFullYear(); wbCalMonth = now.getMonth(); }
+  const grouped = {};
+  words.forEach(w => { const d=w.addedDate||'날짜 없음'; if(!grouped[d]) grouped[d]=[]; grouped[d].push(w); });
+  const label = document.getElementById('wbCalMonthLabel');
+  label.textContent = `${wbCalYear}.${String(wbCalMonth+1).padStart(2,'0')}`;
+  const grid = document.getElementById('wbCalGrid');
+  const todayStr = now.toISOString().split('T')[0];
+  const firstDay = new Date(wbCalYear, wbCalMonth, 1).getDay();
+  const lastDate = new Date(wbCalYear, wbCalMonth+1, 0).getDate();
+
+  const dows = ['일','월','화','수','목','금','토'];
+  document.getElementById('wbCalDowRow').innerHTML = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  let html = '';
+  for(let i=0;i<firstDay;i++) html += `<div class="cal-day empty"></div>`;
+  for(let d=1;d<=lastDate;d++){
+    const dateStr = `${wbCalYear}-${String(wbCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasWords = grouped[dateStr]?.length > 0;
+    const isToday = dateStr === todayStr;
+    const isSelected = dateStr === wbSelectedDate;
+    const cls = ['cal-day', hasWords?'has-words':'', isToday?'today':'', isSelected?'selected':''].filter(Boolean).join(' ');
+    const dot = hasWords ? '<span class="dot-mark"></span>' : '';
+    html += `<div class="${cls}" ${hasWords ? `onclick="selectWbDate('${dateStr}')"` : ''}>${d}${dot}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+window.wbCalPrev = function() { wbCalMonth--; if(wbCalMonth<0){wbCalMonth=11;wbCalYear--;} renderWbCalendar(); };
+window.wbCalNext = function() { wbCalMonth++; if(wbCalMonth>11){wbCalMonth=0;wbCalYear++;} renderWbCalendar(); };
+
+window.selectWbDate = function(date) {
+  wbSelectedDate = wbSelectedDate===date ? null : date;
+  renderWbCalendar();
+  renderWordbook();
+};
+
+window.clearWbDate = function() {
+  wbSelectedDate = null;
+  renderWbCalendar();
+  renderWordbook();
+};
 
 window.rateWord = async function(id, status) {
   const cfg = USER_CONFIG[currentUser];
@@ -1173,6 +1295,7 @@ window.speakCurrent = function(e) {
 
 // ── 날짜별 기록 & 달력 ──
 let calYear, calMonth, selectedDate = null;
+let wbCalYear, wbCalMonth, wbSelectedDate = null, wbCalOpen = false;
 
 function getGrouped() {
   const grouped = {};
@@ -1996,6 +2119,18 @@ document.addEventListener('keydown', e => {
 });
 
 // ── 초기화 ──
+function updateStickyOffsets() {
+  const header = document.querySelector('.header');
+  const userTabs = document.querySelector('.user-tabs');
+  const menuTabs = document.querySelector('.menu-tabs');
+  const headerH = header.offsetHeight;
+  const userTabsH = userTabs.offsetHeight;
+  userTabs.style.top = headerH + 'px';
+  menuTabs.style.top = (headerH + userTabsH) + 'px';
+}
+window.addEventListener('resize', updateStickyOffsets);
+window.addEventListener('load', updateStickyOffsets);
+updateStickyOffsets();
 switchUser('yujin');
 </script>
 </body>
