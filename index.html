@@ -693,7 +693,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // ── 상태 ──
-let currentUser = 'yujin'; // 'yujin' | 'seoyun'
+let currentUser = 'seoyun'; // 'yujin' | 'seoyun'
 let currentMenu = 'wordbook';
 let words = [];
 let filteredCards = [];
@@ -2131,7 +2131,7 @@ function updateStickyOffsets() {
 window.addEventListener('resize', updateStickyOffsets);
 window.addEventListener('load', updateStickyOffsets);
 updateStickyOffsets();
-switchUser('yujin');
+switchUser('seoyun');
 </script>
 </body>
 </html>
